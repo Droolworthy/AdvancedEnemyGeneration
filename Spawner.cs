@@ -1,35 +1,38 @@
+using System.Collections;
 using UnityEngine;
 
-[RequireComponent (typeof(Animator))]
-public class AttackState : State
+public class Spawner : MonoBehaviour
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private float _delay;
+    [SerializeField] public Transform[] _target;
+    [SerializeField] private Transform[] _spawnPoints;
+    [SerializeField] private EnemyMover[] _enemies;   
+    [SerializeField] private int _delay;
 
-    private float _lastAssaultTime;
-    private Animator _animator;
+    private Coroutine _coroutine;
 
     private void Start()
     {
-        _animator = GetComponent<Animator>();
+        if (_coroutine != null)
+            StopCoroutine(_coroutine);
+
+        _coroutine = StartCoroutine(Play(_delay));
     }
 
-    private void Update()
+    private IEnumerator Play(int delay)
     {
-        if(_lastAssaultTime <= 0)
+        bool isWork = true;
+
+        var wait = new WaitForSeconds(delay);
+
+        while (isWork)
         {
-            Assault(Target);
+            int randomNumber = Random.Range(0, _spawnPoints.Length);
 
-            _lastAssaultTime = _delay;
+            var enemy = Instantiate(_enemies[randomNumber], _spawnPoints[randomNumber].position, Quaternion.identity);
+
+            enemy.Init(_target);
+
+            yield return wait;
         }
-
-        _lastAssaultTime -= Time.deltaTime;  
-    }
-
-    private void Assault(Player target)
-    {
-        _animator.Play("Assault");
-
-        target.ApplyDamage(_damage);
     }
 }
