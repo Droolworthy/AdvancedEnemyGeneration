@@ -1,35 +1,12 @@
 using UnityEngine;
 
-[RequireComponent (typeof(Animator))]
-public class AttackState : State
+public class Enemy : MonoBehaviour
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private float _delay;
-
-    private float _lastAssaultTime;
-    private Animator _animator;
-
-    private void Start()
+    private void OnTriggerEnter2D(Collider2D collision)
     {
-        _animator = GetComponent<Animator>();
-    }
-
-    private void Update()
-    {
-        if(_lastAssaultTime <= 0)
+        if (collision.gameObject.TryGetComponent(out Player player))
         {
-            Assault(Target);
-
-            _lastAssaultTime = _delay;
+            Destroy(gameObject);
         }
-
-        _lastAssaultTime -= Time.deltaTime;  
-    }
-
-    private void Assault(Player target)
-    {
-        _animator.Play("Assault");
-
-        target.ApplyDamage(_damage);
     }
 }
