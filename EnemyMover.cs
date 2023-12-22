@@ -1,35 +1,24 @@
 using UnityEngine;
 
-[RequireComponent (typeof(Animator))]
-public class AttackState : State
+public class EnemyMover : MonoBehaviour
 {
-    [SerializeField] private int _damage;
-    [SerializeField] private float _delay;
+    [SerializeField] private float _speed;
 
-    private float _lastAssaultTime;
-    private Animator _animator;
+    private Transform[] _target;
+    private int _spawnPointNumber;
 
     private void Start()
     {
-        _animator = GetComponent<Animator>();
+        _spawnPointNumber = Random.Range(0, _target.Length);
     }
 
     private void Update()
     {
-        if(_lastAssaultTime <= 0)
-        {
-            Assault(Target);
-
-            _lastAssaultTime = _delay;
-        }
-
-        _lastAssaultTime -= Time.deltaTime;  
+        transform.position = Vector2.MoveTowards(transform.position, _target[_spawnPointNumber].position, _speed * Time.deltaTime);
     }
 
-    private void Assault(Player target)
+    public void Init(Transform[] target)
     {
-        _animator.Play("Assault");
-
-        target.ApplyDamage(_damage);
+        _target = target;
     }
 }
